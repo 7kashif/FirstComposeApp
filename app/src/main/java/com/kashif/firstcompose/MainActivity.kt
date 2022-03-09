@@ -1,22 +1,31 @@
 package com.kashif.firstcompose
 
-import android.content.res.Configuration
 import android.os.Bundle
+import android.view.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kashif.firstcompose.ui.MessageItem
@@ -27,39 +36,62 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            FirstComposeTheme{
-
+            FirstComposeTheme {
+                Conversation(messages = sampleMessages)
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String) {
+fun MessageBody(name: String) {
     Text(text = name)
 }
 
 @Composable
+fun MessageAuthor(author: String) {
+    Text(
+        text = author,
+        color = MaterialTheme.colors.secondaryVariant,
+        fontWeight = FontWeight.Bold
+    )
+}
+
+@Composable
 fun MessageCard(item: MessageItem) {
-    Row(
-        modifier = Modifier
-            .padding(all = 8.0.dp)
-            .wrapContentSize(align = Alignment.TopStart, unbounded = false),
-        verticalAlignment = Alignment.CenterVertically
+    var isExpended by remember {
+        mutableStateOf(false)
+    }
+    val surfaceColor: Color by animateColorAsState(targetValue =
+        if(isExpended) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+    )
+
+    Surface(
+        shape = MaterialTheme.shapes.medium, elevation = 2.dp,
+        modifier = Modifier.padding(all = 8.dp)
+            .clickable { isExpended = !isExpended },
+        color = surfaceColor
     ) {
-        Image(
-            painter = painterResource(item.profilePic),
-            contentDescription = "Picture of a husky.",
+        Row(
             modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape)
-                .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(verticalArrangement = Arrangement.Center) {
-            Greeting(name = item.author)
-            Spacer(modifier = Modifier.height(8.0.dp))
-            Greeting(name = item.message)
+                .padding(all = 8.0.dp)
+                .wrapContentSize(align = Alignment.TopStart, unbounded = false),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(item.profilePic),
+                contentDescription = "Picture of a husky.",
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(verticalArrangement = Arrangement.Center) {
+                MessageAuthor(author = item.author)
+                Spacer(modifier = Modifier.height(8.0.dp))
+                MessageBody(name = item.message)
+            }
         }
     }
 }
@@ -67,19 +99,13 @@ fun MessageCard(item: MessageItem) {
 @Composable
 fun Conversation(messages: ArrayList<MessageItem>) {
     LazyColumn {
-        items(messages) {message->
+        items(messages) { message ->
             MessageCard(item = message)
         }
     }
 }
 
-@Preview(name = "Light Mode", showBackground = true)
-@Preview(
-    name = "Dark Mode",
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-    showSystemUi = true
-)
+@Preview(name = "Light Mode", showBackground = true, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
     FirstComposeTheme {
