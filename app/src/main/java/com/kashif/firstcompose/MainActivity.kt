@@ -1,11 +1,9 @@
 package com.kashif.firstcompose
 
 import android.os.Bundle
-import android.view.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,10 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,8 +39,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MessageBody(name: String) {
-    Text(text = name)
+fun MessageBody(name: String, isExpended: Boolean) {
+    Text(
+        text = name,
+        maxLines = if (isExpended) name.length - 1 else 1
+    )
 }
 
 @Composable
@@ -59,42 +57,48 @@ fun MessageAuthor(author: String) {
 
 @Composable
 fun MessageCard(item: MessageItem) {
-    var isExpended by remember {
-        mutableStateOf(false)
-    }
-    val surfaceColor: Color by animateColorAsState(targetValue =
-        if(isExpended) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-    )
 
-    Surface(
-        shape = MaterialTheme.shapes.medium, elevation = 2.dp,
-        modifier = Modifier.padding(all = 8.dp)
-            .clickable { isExpended = !isExpended },
-        color = surfaceColor
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 8.0.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        var isExpended by remember {
+            mutableStateOf(false)
+        }
+        val surfaceColor: Color by animateColorAsState(
+            targetValue =
+            if (isExpended) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+        )
+        Image(
+            painter = painterResource(item.profilePic),
+            contentDescription = "Picture of a husky.",
             modifier = Modifier
-                .padding(all = 8.0.dp)
-                .wrapContentSize(align = Alignment.TopStart, unbounded = false),
-            verticalAlignment = Alignment.CenterVertically
+                .size(60.dp)
+                .clip(CircleShape)
+                .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Surface(
+            shape = MaterialTheme.shapes.medium, elevation = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { isExpended = !isExpended },
+            color = surfaceColor
         ) {
-            Image(
-                painter = painterResource(item.profilePic),
-                contentDescription = "Picture of a husky.",
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(verticalArrangement = Arrangement.Center) {
+            Column(
+                modifier = Modifier.padding(all = 8.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
                 MessageAuthor(author = item.author)
                 Spacer(modifier = Modifier.height(8.0.dp))
-                MessageBody(name = item.message)
+                MessageBody(name = item.message, isExpended)
             }
         }
     }
 }
+
 
 @Composable
 fun Conversation(messages: ArrayList<MessageItem>) {
