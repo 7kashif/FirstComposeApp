@@ -1,4 +1,4 @@
-package com.kashif.firstcompose.ui
+package com.kashif.firstcompose
 
 import com.kashif.firstcompose.R
 

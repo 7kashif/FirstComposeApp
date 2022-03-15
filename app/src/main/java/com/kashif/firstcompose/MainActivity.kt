@@ -23,8 +23,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kashif.firstcompose.ui.MessageItem
-import com.kashif.firstcompose.ui.sampleMessages
 import com.kashif.firstcompose.ui.theme.FirstComposeTheme
 
 class MainActivity : ComponentActivity() {
