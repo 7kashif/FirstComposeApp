@@ -1,5 +1,6 @@
 package com.kashif.firstcompose
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
